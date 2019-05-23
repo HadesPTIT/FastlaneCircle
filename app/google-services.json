@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "730624007736",
+    "firebase_url": "https://circleci-7d00a.firebaseio.com",
+    "project_id": "circleci-7d00a",
+    "storage_bucket": "circleci-7d00a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:730624007736:android:48aa660da734f702",
+        "android_client_info": {
+          "package_name": "com.hades.fastlanecircle"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "730624007736-rfo98hp4ka8p9v6nrefhn0qk9kbq0iee.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBt1h2HfpyMlWN1jYEOWFA25Rt8ZafNqq0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "730624007736-rfo98hp4ka8p9v6nrefhn0qk9kbq0iee.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
