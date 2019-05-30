@@ -1,5 +1,10 @@
 version: 2
 
+#
+# & : Repeated nodes are first identified by an anchor (&) then aliased by asterisk (*)
+# << : Reusable and extend (https://blog.daemonl.com/2016/02/yaml.html)
+#
+
 references:
   # We will define reusable references here
 
@@ -14,8 +19,8 @@ references:
     save_cache:
       <<: *cache_key
       paths:
-      - ~/.gradle
-      - ~/.m2
+        - ~/.gradle
+        - ~/.m2
 
   ## Workspace
 
@@ -31,16 +36,16 @@ references:
     persist_to_workspace:
       root: *workspace
       paths:
-      - app/build/intermediates
-      - app/build/outputs/androidTest-results
-      - app/build/outputs/apk
-      - app/build/outputs/code-coverage
-      - app/build/test-results
+        - app/build/intermediates
+        - app/build/outputs/androidTest-results
+        - app/build/outputs/apk
+        - app/build/outputs/code-coverage
+        - app/build/test-results
   persist_release_workspace: &persist_release_workspace
     persist_to_workspace:
       root: *workspace
       paths:
-      - app/build
+        - app/build
   attach_firebase_workspace: &attach_firebase_workspace
     attach_workspace:
       at: *workspace
@@ -48,7 +53,7 @@ references:
     persist_to_workspace:
       root: *workspace
       paths:
-      - firebase
+        - firebase
 
   ## Docker image configurations
 
@@ -56,7 +61,7 @@ references:
     android_config: &android_config
       working_directory: *workspace
       docker:
-      - image: circleci/android:api-28-alpha
+        - image: circleci/android:api-28-alpha
       environment:
         TERM: dumb
         _JAVA_OPTIONS: "-Xmx2048m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
@@ -66,7 +71,7 @@ references:
   gcloud_config: &gcloud_config
     working_directory: *workspace
     docker:
-    - image: google/cloud-sdk:latest
+      - image: google/cloud-sdk:latest
     environment:
       TERM: dumb
 
@@ -96,21 +101,21 @@ jobs:
   build_debug:
       <<: *android_config
       steps:
-      - checkout
-      - *restore_cache
-      - run:
-          name: Download dependencies
-          command: ./gradlew androidDependencies
-      - *save_cache
-      - *export_gservices_key
-      - *decode_gservices_key
-      - run:
-          name: Gradle build (debug)
-          command: ./gradlew -PciBuild=true :app:assembleDebug :app:assembleAndroidTest
-      - *persist_debug_workspace
-      - store_artifacts:
-          path: app/build/outputs/apk/
-          destination: /apk/
+        - checkout
+        - *restore_cache
+        - run:
+            name: Download dependencies
+            command: ./gradlew androidDependencies
+        - *save_cache
+        - *export_gservices_key
+        - *decode_gservices_key
+        - run:
+            name: Gradle build (debug)
+            command: ./gradlew -PciBuild=true :app:assembleDebug :app:assembleAndroidTest
+        - *persist_debug_workspace
+        - store_artifacts:
+            path: app/build/outputs/apk/
+            destination: /apk/
 
   # Run unit tests
   test_unit:
@@ -140,36 +145,36 @@ jobs:
   test_instrumented:
       <<: *gcloud_config
       steps:
-      - *attach_debug_workspace
-      - *export_gcloud_key
-      - *decode_gcloud_key
-      - run:
-          name: Set Google Cloud target project
-          command: gcloud config set project circleci-7d00a
-      - run:
-          name: Authenticate with Google Cloud
-          command: gcloud auth activate-service-account huongpt@circleci-7d00a.iam.gserviceaccount.com --key-file ${HOME}/client-secret.json
-      - run:
-          name: Run instrumented test on Firebase Test Lab
-          command: |
-            gcloud firebase test android run \
-              --type instrumentation \
-              --app app/build/outputs/apk/debug/app-debug.apk \
-              --test app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk \
-              --device model=Nexus4,version=22,locale=en_US,orientation=portrait \
-#              --environment-variables coverage=true,coverageFile="/sdcard/coverage.ec" \
-#              --directories-to-pull=/sdcard --timeout 30m
-          no_output_timeout: 45m
-      - run:
-          name: Create directory to store test results
-          command: mkdir firebase
-#      - run:
-#          name: Download instrumented test results from Firebase Test Lab
-#          command: gsutil -m cp -r -U "`gsutil ls gs://test-lab-{some random ID}-{some other random ID} | tail -1`*" /root/workspace/firebase/ | true
-#      - *persist_firebase_workspace
-#      - store_artifacts:
-#          path: firebase/
-#          destination: /firebase/
+        - *attach_debug_workspace
+        - *export_gcloud_key
+        - *decode_gcloud_key
+        - run:
+            name: Set Google Cloud target project
+            command: gcloud config set project circleci-7d00a
+        - run:
+            name: Authenticate with Google Cloud
+            command: gcloud auth activate-service-account huongpt@circleci-7d00a.iam.gserviceaccount.com --key-file ${HOME}/client-secret.json
+        - run:
+            name: Run instrumented test on Firebase Test Lab
+            command: |
+              gcloud firebase test android run \
+                --type instrumentation \
+                --app app/build/outputs/apk/debug/app-debug.apk \
+                --test app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk \
+                --device model=Nexus4,version=22,locale=en_US,orientation=portrait \
+#                --environment-variables coverage=true,coverageFile="/sdcard/coverage.ec" \
+#                --directories-to-pull=/sdcard --timeout 30m
+            no_output_timeout: 45m
+        - run:
+            name: Create directory to store test results
+            command: mkdir firebase
+#        - run:
+#            name: Download instrumented test results from Firebase Test Lab
+#            command: gsutil -m cp -r -U "`gsutil ls gs://test-lab-{some random ID}-{some other random ID} | tail -1`*" /root/workspace/firebase/ | true
+#        - *persist_firebase_workspace
+#        - store_artifacts:
+#            path: firebase/
+#            destination: /firebase/
 
   # Submit JaCoCo coverage report
 #  report_coverage:
@@ -183,7 +188,7 @@ workflows:
       - build_debug
       - test_unit:
           requires:
-          - build_debug
+            - build_debug
       - test_instrumented:
           requires:
-          - build_debug
+            - build_debug
