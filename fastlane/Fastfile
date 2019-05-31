@@ -1,0 +1,263 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+before_all do
+  Dotenv.overload '.env.secret'
+end
+
+platform :android do
+desc "Beta Develop Distribution
+Example:  fastlane android beta remote:framgia pullNumber:123 branch:571_create_register_logic  |
+Or: fastlane android beta branch:571_create_register_logic   |
+You can skip passing value for list parameter above"
+lane :develop do |options|
+
+  releaseNoteInput = prompt(
+      text: "Please enter your release notes. This note will be pushed on Fabric: ",
+      multi_line_end_keyword: "END"
+  )
+ time1 = Time.new
+ time = time1.strftime("%Y-%m-%d %H:%M:%S")
+ releaseNote =   time + "   " + releaseNoteInput
+
+  # buildNumber = options[:buildNumber]
+  remote = options[:remote]
+  pullNumber = options[:pullNumber]
+  branchName = options[:branch]
+
+  #fetch code
+  content = ""
+
+  #check isNumber function
+  class String
+    def is_i?
+       /\A[-+]?\d+\z/ === self
+    end
+  end
+
+  #ticket number
+  ticketNumber = ""
+  ticketNumber = branchName.split('_').first
+  # puts "#{ticketNumber}"
+  commit = last_git_commit
+
+  if !/\A\d+\z/.match(ticketNumber)
+      #Is not a positive number
+      raise 'Your branch name format is incorrect.Please take a look an example format: ---> ticket number_your_task_name : 6969_login_screen_UI_only <---.Thanks a lot!'
+      return
+  else
+    puts "OK"
+  end
+
+  if remote.nil? || branchName.nil?
+    puts "Do not fetch code"
+      if branchName.nil?
+        puts "Do not have branchName"
+      else
+        content = "\t|\t Branch: #{branchName} \t|\tRelease note: #{releaseNote}"
+      end
+  else
+    ensure_git_status_clean
+    sh "git fetch #{remote} refs/pull/#{pullNumber}/head:#{branchName}"
+    sh "git checkout #{branchName}"
+    content = "\t|\tRemote: #{remote} \t|\tPull number: #{pullNumber}\t|\tBranch: #{branchName} \t|\tRelease note: #{releaseNote}"
+  end
+
+  puts "-------------------Done ---------------------- + #{ticketNumber}"
+#build
+  gradle(task: 'clean' )
+  gradle(task: 'assemble', build_type: 'develop', properties: { 'versionCode' => ticketNumber })
+
+puts "------------------- Distribution via Fabric ----------------------"
+   fabric(releaseNote:releaseNote)
+  puts "------------------- Send notify via Chatword ----------------------"
+  notify_CW(ticketNumber:ticketNumber ,commit:commit , content:content , buildType:'Develop' , platform:'Android')
+  puts "-------------------Done ----------------------"
+end
+# start !!!
+desc "Beta Staging Distribution
+Example:  fastlane android beta_stg remote:framgia pullNumber:123 branch:571_create_register_logic  |
+Or: fastlane android beta_stg branch:571_create_register_logic   |
+You can skip passing value for list parameter above"
+lane :debug do |options|
+
+ releaseNoteInput = "Demo build"
+ time1 = Time.new
+ time = time1.strftime("%Y-%m-%d %H:%M:%S")
+ releaseNote =   time + "   " + releaseNoteInput
+
+  # buildNumber = options[:buildNumber]
+  remote = options[:remote]
+  pullNumber = options[:pullNumber]
+  branchName = options[:branch]
+
+  #fetch code
+  content = ""
+
+  #check isNumber function
+  class String
+    def is_i?
+       /\A[-+]?\d+\z/ === self
+    end
+  end
+
+  #ticket number
+  ticketNumber = ""
+  ticketNumber = branchName.split('_').first
+  # puts "#{ticketNumber}"
+  commit = last_git_commit
+
+  if !/\A\d+\z/.match(ticketNumber)
+      #Is not a positive number
+      raise 'Your branch name format is incorrect.Please take a look an example format: ---> ticket number_your_task_name : 6969_login_screen_UI_only <---.Thanks a lot!'
+      return
+  else
+    puts "OK"
+  end
+
+  if remote.nil? || branchName.nil?
+    puts "Do not fetch code"
+      if branchName.nil?
+        puts "Do not have branchName"
+      else
+        content = "\t|\t Branch: #{branchName} \t|\tRelease note: #{releaseNote}"
+      end
+  else
+    ensure_git_status_clean
+    sh "git fetch #{remote} refs/pull/#{pullNumber}/head:#{branchName}"
+    sh "git checkout #{branchName}"
+    content = "\t|\tRemote: #{remote} \t|\tPull number: #{pullNumber}\t|\tBranch: #{branchName} \t|\tRelease note: #{releaseNote}"
+  end
+
+
+#build
+  gradle(task: 'clean')
+  gradle(task: 'assemble', build_type: 'debug', properties: { 'versionCode' => ticketNumber })
+
+  puts "------------------- Distribution via Fabric ----------------------"
+  fabric(releaseNote:releaseNote)
+  puts "------------------- Send notify via Chatword ----------------------"
+  notify_CW(ticketNumber:ticketNumber ,commit:commit , content:content ,buildType:'debug', platform:'Android' )
+  puts "-------------------Done ----------------------"
+end
+
+# end !!!
+
+desc "Production  Distribution
+Example:  fastlane android prod remote:framgia pullNumber:123 branch:571_create_register_logic  |
+Or: fastlane android prod branch:571_create_register_logic   |
+You can skip passing value for list parameter above"
+lane :production do |options|
+
+  releaseNoteInput = prompt(
+      text: "Please enter your release notes. This note will be pushed on Fabric: ",
+      multi_line_end_keyword: "END"
+  )
+ time1 = Time.new
+ time = time1.strftime("%Y-%m-%d %H:%M:%S")
+ releaseNote =   time + "   " + releaseNoteInput
+
+  # buildNumber = options[:buildNumber]
+  remote = options[:remote]
+  pullNumber = options[:pullNumber]
+  branchName = options[:branch]
+
+  #fetch code
+  content = ""
+
+  #check isNumber function
+  class String
+    def is_i?
+       /\A[-+]?\d+\z/ === self
+    end
+  end
+
+  #ticket number
+  ticketNumber = ""
+  ticketNumber = branchName.split('_').first
+  # puts "#{ticketNumber}"
+  commit = last_git_commit
+
+  if !/\A\d+\z/.match(ticketNumber)
+      #Is not a positive number
+      raise 'Your branch name format is incorrect.Please take a look an example format: ---> ticket number_your_task_name : 6969_login_screen_UI_only <---.Thanks a lot!'
+      return
+  else
+    puts "OK"
+  end
+
+  if remote.nil? || branchName.nil?
+    puts "Do not fetch code"
+      if branchName.nil?
+        puts "Do not have branchName"
+      else
+        content = "\t|\t Branch: #{branchName} \t|\tRelease note: #{releaseNote}"
+      end
+  else
+    ensure_git_status_clean
+    sh "git fetch #{remote} refs/pull/#{pullNumber}/head:#{branchName}"
+    sh "git checkout #{branchName}"
+    content = "\t|\tRemote: #{remote} \t|\tPull number: #{pullNumber}\t|\tBranch: #{branchName} \t|\tRelease note: #{releaseNote}"
+  end
+
+
+#build
+  gradle(task: 'clean')
+  gradle(task: 'assemble', build_type: 'release',properties: { 'versionCode' => ticketNumber })
+
+  puts "------------------- Distribution via Fabric ----------------------"
+  fabric(releaseNote:releaseNote)
+  puts "------------------- Send notify via Chatword ----------------------"
+  notify_CW(ticketNumber:ticketNumber ,commit:commit , content:content ,buildType:'Production',platform:'Android' )
+  puts "-------------------Done ----------------------"
+end
+
+
+desc "notification on chatwork "
+  lane :notify_CW do |values|
+    ticketNumber = values[:ticketNumber]
+    commit = values[:commit]
+    content = values[:content]
+    buildType = values[:buildType]
+    platform= values[:platform]
+    currentVersionNumber = Actions.lane_context[SharedValues::VERSION_NUMBER]
+    puts "-------------------Done ---------------------- ticketNumber  #{ticketNumber} , currentVersionNumber #{currentVersionNumber} , #{buildType} "
+    chatwork(
+        message: "[To:122422385]
+    Platform : #{platform}
+    BuildType : #{buildType}
+    Ticket #{ticketNumber} has been uploaded successfully to Fabric!
+     Build number: #{ticketNumber} \t|\t Author: #{commit[:author]} \t|\t Author email: #{commit[:author_email]} \t#{content}",
+        roomid: 150866199, #change with your room id
+        success: true,
+        api_token: "#{ENV['CHATWORK_API_TOKEN']}" #api token of chatbot
+    )
+
+end
+
+desc 'Upload to Fabric.'
+lane :fabric do |values|
+  releaseNote = values[:releaseNote]
+  crashlytics(
+    api_token: "#{ENV['FABRIC_API_TOKEN']}",
+    build_secret: "#{ENV['FABRIC_BUILD_SECRET']}",
+    groups: ['Demo'],
+    notifications: true,
+    notes: "#{releaseNote}",
+    apk_path: Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH]
+  )
+end
+
+end
