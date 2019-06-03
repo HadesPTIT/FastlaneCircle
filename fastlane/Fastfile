@@ -82,7 +82,7 @@ lane :develop do |options|
 
 puts "------------------- Distribution via Fabric ----------------------"
    fabric(releaseNote:releaseNote)
-  puts "------------------- Send notify via Chatword ----------------------"
+  puts "------------------- Send notify via Chatwork ----------------------"
   notify_CW(ticketNumber:ticketNumber ,commit:commit , content:content , buildType:'Develop' , platform:'Android')
   puts "-------------------Done ----------------------"
 end
@@ -148,7 +148,7 @@ lane :debug do |options|
 
   puts "------------------- Distribution via Fabric ----------------------"
   fabric(releaseNote:releaseNote)
-  puts "------------------- Send notify via Chatword ----------------------"
+  puts "------------------- Send notify via Chatwork ----------------------"
   notify_CW(ticketNumber:ticketNumber ,commit:commit , content:content ,buildType:'debug', platform:'Android' )
   puts "-------------------Done ----------------------"
 end
@@ -219,7 +219,7 @@ lane :production do |options|
 
   puts "------------------- Distribution via Fabric ----------------------"
   fabric(releaseNote:releaseNote)
-  puts "------------------- Send notify via Chatword ----------------------"
+  puts "------------------- Send notify via Chatwork ----------------------"
   notify_CW(ticketNumber:ticketNumber ,commit:commit , content:content ,buildType:'Production',platform:'Android' )
   puts "-------------------Done ----------------------"
 end
@@ -250,6 +250,7 @@ end
 desc 'Upload to Fabric.'
 lane :fabric do |values|
   releaseNote = values[:releaseNote]
+  puts "Context : #{Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH]}"
   crashlytics(
     api_token: "#{ENV['FABRIC_API_TOKEN']}",
     build_secret: "#{ENV['FABRIC_BUILD_SECRET']}",
