@@ -201,9 +201,9 @@ workflows:
       - test_unit:
           requires:
             - build_debug
-#      - test_instrumented:
-#          requires:
-#            - build_debug
+      - test_instrumented:
+          requires:
+            - build_debug
 #      - deploy_fabric:
 #          requires:
 #            - build_debug
