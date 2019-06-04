@@ -134,12 +134,24 @@ jobs:
           command: ./gradlew -PciBuild=true :app:testDebugUnitTest --no-daemon --max-workers 2
       - *persist_debug_workspace
       - store_artifacts:
-          path: app/build/reports/`
+          path: app/build/reports/
           destination: /reports/
       - store_test_results:
           path: app/build/test-results/
           destination: /test-results/
 
+  deploy_fabric:
+      <<: *android_config
+      steps:
+        - checkout
+        - *attach_debug_workspace
+        - *restore_cache
+        - run:
+            name: Install fastlane
+            command: bundle install
+        - run:
+            name: Deploy to fabric
+            command: bundle exec fastlane android debug branch:123_config_fastlane_2
 
   # Run instrumented tests
   test_instrumented:
@@ -189,6 +201,9 @@ workflows:
       - test_unit:
           requires:
             - build_debug
-      - test_instrumented:
-          requires:
-            - build_debug
+#      - test_instrumented:
+#          requires:
+#            - build_debug
+#      - deploy_fabric:
+#          requires:
+#            - build_debug
