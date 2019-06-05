@@ -174,19 +174,19 @@ jobs:
                 --app app/build/outputs/apk/debug/app-debug.apk \
                 --test app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk \
                 --device model=Nexus4,version=22,locale=en_US,orientation=portrait \
-#                --environment-variables coverage=true,coverageFile="/sdcard/coverage.ec" \
-#                --directories-to-pull=/sdcard --timeout 30m
+                --environment-variables coverage=true,coverageFile="/sdcard/coverage.ec" \
+                --directories-to-pull=/sdcard --timeout 30m
             no_output_timeout: 45m
         - run:
             name: Create directory to store test results
             command: mkdir firebase
-#        - run:
-#            name: Download instrumented test results from Firebase Test Lab
-#            command: gsutil -m cp -r -U "`gsutil ls gs://test-lab-{some random ID}-{some other random ID} | tail -1`*" /root/workspace/firebase/ | true
-#        - *persist_firebase_workspace
-#        - store_artifacts:
-#            path: firebase/
-#            destination: /firebase/
+        - run:
+            name: Download instrumented test results from Firebase Test Lab
+            command: gsutil -m cp -r -U "`gsutil ls gs://test-lab-qa9qsuh37t7zw-mhbz4aa18f1mi | tail -1`*" /root/workspace/firebase/ | true
+        - *persist_firebase_workspace
+        - store_artifacts:
+            path: firebase/
+            destination: /firebase/
 
   # Submit JaCoCo coverage report
 #  report_coverage:
@@ -198,9 +198,9 @@ workflows:
   workflow:
     jobs:
       - build_debug
-      - test_unit:
-          requires:
-            - build_debug
+#      - test_unit:
+#          requires:
+#            - build_debug
       - test_instrumented:
           requires:
             - build_debug
