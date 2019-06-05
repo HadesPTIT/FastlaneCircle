@@ -27,11 +27,15 @@ public class LoginActivityTest {
 
 
     @Test
-    public void clickSubmitButton() {
+    public void clickSubmitButton_Success() throws InterruptedException {
 
         Espresso.onView(ViewMatchers.withId(R.id.et_username)).perform(ViewActions.typeText(mUsername));
 
+        Thread.sleep(1000);
+
         Espresso.onView(ViewMatchers.withId(R.id.et_password)).perform(ViewActions.typeText(mPassword));
+
+        Thread.sleep(1000);
 
         Espresso.onView(ViewMatchers.withId(R.id.btn_submit)).perform(ViewActions.scrollTo(), ViewActions.click());
 
@@ -39,5 +43,54 @@ public class LoginActivityTest {
 
     }
 
+    @Test
+    public void clickSubmitButton_Failure() throws InterruptedException {
 
+        Espresso.onView(ViewMatchers.withId(R.id.et_username)).perform(ViewActions.typeText(""));
+
+        Thread.sleep(1000);
+
+        Espresso.onView(ViewMatchers.withId(R.id.et_password)).perform(ViewActions.typeText(""));
+
+        Thread.sleep(1000);
+
+        Espresso.onView(ViewMatchers.withId(R.id.btn_submit)).perform(ViewActions.scrollTo(), ViewActions.click());
+
+        Espresso.onView(ViewMatchers.withId(R.id.tv_login)).check(ViewAssertions.matches(ViewMatchers.withText("Failure")));
+
+    }
+
+    @Test
+    public void clickSubmitButton_Failure_Case2() throws InterruptedException {
+
+        Espresso.onView(ViewMatchers.withId(R.id.et_username)).perform(ViewActions.typeText(mUsername));
+
+        Thread.sleep(1000);
+
+        Espresso.onView(ViewMatchers.withId(R.id.et_password)).perform(ViewActions.typeText(""));
+
+        Thread.sleep(1000);
+
+        Espresso.onView(ViewMatchers.withId(R.id.btn_submit)).perform(ViewActions.scrollTo(), ViewActions.click());
+
+        Espresso.onView(ViewMatchers.withId(R.id.tv_login)).check(ViewAssertions.matches(ViewMatchers.withText("Failure")));
+
+    }
+
+    @Test
+    public void clickSubmitButton_Failure_case3() throws InterruptedException {
+
+        Espresso.onView(ViewMatchers.withId(R.id.et_username)).perform(ViewActions.typeText(""));
+
+        Thread.sleep(1000);
+
+        Espresso.onView(ViewMatchers.withId(R.id.et_password)).perform(ViewActions.typeText(mPassword));
+
+        Thread.sleep(1000);
+
+        Espresso.onView(ViewMatchers.withId(R.id.btn_submit)).perform(ViewActions.scrollTo(), ViewActions.click());
+
+        Espresso.onView(ViewMatchers.withId(R.id.tv_login)).check(ViewAssertions.matches(ViewMatchers.withText("Failure")));
+
+    }
 }
