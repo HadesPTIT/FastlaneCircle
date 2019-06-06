@@ -111,8 +111,11 @@ jobs:
         - *export_gservices_key
         - *decode_gservices_key
         - run:
-            name: Gradle build (debug)
-            command: ./gradlew -PciBuild=true :app:assembleDebug :app:assembleAndroidTest
+            name: Install fastlane
+            command: bundle install
+        - run:
+            name: Deploy to fabric
+            command: bundle exec fastlane android Build
         - *persist_debug_workspace
         - store_artifacts:
             path: app/build/outputs/apk/
