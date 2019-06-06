@@ -61,13 +61,14 @@ references:
     android_config: &android_config
       working_directory: *workspace
       docker:
-        - image: circleci/android:api-28-alpha
+        - image: circleci/android:api-28-alpha   # gcloud is baked into this image
       environment:
         TERM: dumb
         _JAVA_OPTIONS: "-Xmx2048m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
         GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m"'
         ADB_INSTALL_TIMEOUT: 20
 
+  # Gcloud is baked in to circleci/android:api-28-alpha so not need to import google/cloud-sdk:latest
   gcloud_config: &gcloud_config
     working_directory: *workspace
     docker:
@@ -151,11 +152,11 @@ jobs:
             command: bundle install
         - run:
             name: Deploy to fabric
-            command: bundle exec fastlane android debug branch:123_config_fastlane_2
+            command: bundle exec fastlane android BuildFastlane
 
   # Run instrumented tests
   test_instrumented:
-      <<: *gcloud_config
+      <<: *android_config
       steps:
         - *attach_debug_workspace
         - *export_gcloud_key
@@ -167,19 +168,24 @@ jobs:
             name: Authenticate with Google Cloud
             command: gcloud auth activate-service-account huongpt@circleci-7d00a.iam.gserviceaccount.com --key-file ${HOME}/client-secret.json
         - run:
+            name: Configure environment
+            command: |
+              echo 'export APK_PATH=`find . -path "*.apk" ! -path "*unaligned.apk" ! -path "*Test*.apk" -print -quit`' >> $BASH_ENV
+              echo 'export TEST_APK_PATH=`find "." "-path" "*Test*.apk" -print -quit`' >> $BASH_ENV
+        - run:
             name: Run instrumented test on Firebase Test Lab
             command: |
               gcloud firebase test android run \
                 --type instrumentation \
-                --app app/build/outputs/apk/debug/app-debug.apk \
-                --test app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk \
+                --app ${APK_PATH} \
+                --test ${TEST_APK_PATH} \
                 --device model=Nexus4,version=22,locale=en_US,orientation=portrait \
 #                --environment-variables coverage=true,coverageFile="/sdcard/coverage.ec" \
 #                --directories-to-pull=/sdcard --timeout 30m
             no_output_timeout: 45m
-        - run:
-            name: Create directory to store test results
-            command: mkdir firebase
+#        - run:
+#            name: Create directory to store test results
+#            command: mkdir firebase
 #        - run:
 #            name: Download instrumented test results from Firebase Test Lab
 #            command: gsutil -m cp -r -U "`gsutil ls gs://test-lab-{some random ID}-{some other random ID} | tail -1`*" /root/workspace/firebase/ | true
@@ -204,6 +210,6 @@ workflows:
       - test_instrumented:
           requires:
             - build_debug
-#      - deploy_fabric:
-#          requires:
-#            - build_debug
+      - deploy_fabric:
+          requires:
+            - test_unit
