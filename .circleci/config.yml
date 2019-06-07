@@ -178,6 +178,7 @@ jobs:
         - run:
             name: Run instrumented test on Firebase Test Lab
             command: |
+              echo ${APK_PATH}
               gcloud firebase test android run \
                 --type instrumentation \
                 --app ${APK_PATH} \
@@ -207,12 +208,12 @@ workflows:
   workflow:
     jobs:
       - build_debug
-      - test_unit:
-          requires:
-            - build_debug
-      - test_instrumented:
-          requires:
-            - build_debug
+#      - test_unit:
+#          requires:
+#            - build_debug
+#      - test_instrumented:
+#          requires:
+#            - build_debug
       - deploy_fabric:
           requires:
-            - test_unit
+            - build_debug

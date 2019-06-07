@@ -277,7 +277,7 @@ lane :uploadFabric do |values|
    # groups:["#{ENV['GROUP_TESTER']}"],
    notifications: true,
    notes: "#{releaseNote}",
-   apk_path: Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH]
+   apk_path: "./app/build/outputs/apk/debug/app-debug.apk"
   )
  puts "------------------- Distribution via Fabric successfully !!  "
 end
