@@ -272,7 +272,6 @@ lane :uploadFabric do |values|
    va = File.absolute_path("../app/build/outputs/apk/")  
    va2 = va+'/*/*.apk'
    path = Dir[va2][0]
-   puts "------------------- Starting distribution via Fabric  .......... #{value} "
    puts "------------------- APK .......... #{path}  -------"
 
  crashlytics(

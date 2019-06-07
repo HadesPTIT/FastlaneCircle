@@ -15,7 +15,6 @@ import com.hades.fastlanecircle.databinding.ActivityMainBinding;
 public class MainActivity extends AppCompatActivity {
 
     private MainViewModel mViewModel;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
