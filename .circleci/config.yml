@@ -213,6 +213,10 @@ workflows:
       - test_instrumented:
           requires:
             - build_debug
+          filters:
+            branches:
+              ignore:
+                - develop
       - deploy_fabric:
           requires:
             - test_unit
