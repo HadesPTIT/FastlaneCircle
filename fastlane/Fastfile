@@ -36,7 +36,7 @@ desc "Beta Distribution "
   puts "------------------- Build app ---------- releaseNote ------  #{releaseNote}! "
   #build
   begin
- buildApp(ticketNumber: ticketNumber , buildType: buildType)
+ # buildApp(ticketNumber: ticketNumber , buildType: buildType)
   rescue => ex
     UI.error(ex)
   end
@@ -267,9 +267,13 @@ desc 'Upload to Fabric.
    Example:  fastlane android  uploadFabric '
 lane :uploadFabric do |values|
    releaseNote = values[:releaseNote]
-   apk = Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH]
-   puts "------------------- Starting distribution via Fabric  .......... #{releaseNote} "
-   puts "------------------- APK .......... #{apk} "
+   # apk = Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH]
+   # value = File.dirname(path)
+   va = File.absolute_path("../app/build/outputs/apk/")  
+   va2 = va+'/*/*.apk'
+   path = Dir[va2][0]
+   puts "------------------- Starting distribution via Fabric  .......... #{value} "
+   puts "------------------- APK .......... #{path}  -------"
 
  crashlytics(
    api_token: "#{ENV['FABRIC_API_TOKEN']}",
@@ -277,7 +281,7 @@ lane :uploadFabric do |values|
    # groups:["#{ENV['GROUP_TESTER']}"],
    notifications: true,
    notes: "#{releaseNote}",
-   apk_path: Actions.lane_context[SharedValues::GRADLE_APK_OUTPUT_PATH]
+   apk_path: path
   )
  puts "------------------- Distribution via Fabric successfully !!  "
 end
